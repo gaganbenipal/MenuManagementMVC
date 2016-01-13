@@ -4,16 +4,40 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using MenuManagementMVC.Context;
+using MenuManagementMVC.Models.UserDefined;
+using MenuManagementMVC.App_Code;
+using System.Web.Security;
+using Microsoft.AspNet.Identity;
 
 namespace MenuManagementMVC.Controllers.UserDefined
 {
     public class RecipeController : Controller
     {
         RecipeContext db = new RecipeContext();
+       
         // GET: Recipe
         public ActionResult Index()
         {
-            return View(db.Recipes.ToList());
+            if (ModelState.IsValid)
+            {
+                if (Request.IsAuthenticated)
+                {
+                    // login logic here
+
+                    //the below query will also work
+                    //IEnumerable<Recipe> objRecipe = from recipes in db.Recipes where recipes.UserId.Equals(User.Identity.GetUserId()) select recipes;
+                    string userId = User.Identity.GetUserId();
+                    IEnumerable<Recipe> objRecipe = db.Recipes.Where(s => s.UserId.Equals(userId));
+
+                    return View(objRecipe);
+                }
+                else
+                {
+                    
+                    return Redirect("~/Home/Index");
+                }
+            }
+            return Redirect("~/Home/Index");
         }
 
         // GET: Recipe/Details/5
@@ -25,23 +49,52 @@ namespace MenuManagementMVC.Controllers.UserDefined
         // GET: Recipe/Create
         public ActionResult Create()
         {
-            return View();
+            if (ModelState.IsValid)
+            {
+                if (Request.IsAuthenticated)
+                {
+                    // login logic here
+                    return View();
+                }
+                else
+                {
+                    return Redirect("~/Home/Index");
+                }
+            }
+            return Redirect("~/Home/Index");
+           
         }
 
         // POST: Recipe/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(Recipe objRecipe)
         {
+
             try
             {
                 // TODO: Add insert logic here
-                
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    if (Request.IsAuthenticated)
+                    {
+                        objRecipe.LastUpdatedDate = DateTime.Now;
+                        objRecipe.RecordStatus = clsStatic.ACTIVE;
+                        objRecipe.UserId = User.Identity.GetUserId();
+                        db.Recipes.Add(objRecipe);
+                        db.SaveChanges();
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        return Redirect("~/Home/Index");
+                    }
+                }
             }
             catch
             {
                 return View();
             }
+            return View();
         }
 
         // GET: Recipe/Edit/5
