@@ -8,6 +8,8 @@ using MenuManagementMVC.Models.UserDefined;
 using MenuManagementMVC.App_Code;
 using System.Web.Security;
 using Microsoft.AspNet.Identity;
+using System.Net;
+using System.Data.Entity;
 
 namespace MenuManagementMVC.Controllers.UserDefined
 {
@@ -72,16 +74,27 @@ namespace MenuManagementMVC.Controllers.UserDefined
 
             try
             {
+
                 // TODO: Add insert logic here
                 if (ModelState.IsValid)
                 {
                     if (Request.IsAuthenticated)
                     {
+                        HttpPostedFileBase file = Request.Files["RecipeImageURL"];
+                        string imageName = System.IO.Path.GetFileNameWithoutExtension(file.FileName) + System.Guid.NewGuid() +
+                                            System.IO.Path.GetExtension(file.FileName);
+                        string path = System.IO.Path.Combine(Server.MapPath(clsStatic.RECIPE_IMAGES_PATH), imageName);  //full path of file
+
                         objRecipe.LastUpdatedDate = DateTime.Now;
                         objRecipe.RecordStatus = clsStatic.ACTIVE;
+                        objRecipe.RecipeImageURL = imageName;
                         objRecipe.UserId = User.Identity.GetUserId();
                         db.Recipes.Add(objRecipe);
                         db.SaveChanges();
+
+                        //we save the file after the db changes.. might be a chance that image is large or any other error occurred.
+                        file.SaveAs(path);
+
                         return RedirectToAction("Index");
                     }
                     else
@@ -100,38 +113,135 @@ namespace MenuManagementMVC.Controllers.UserDefined
         // GET: Recipe/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
-        }
-
-        // POST: Recipe/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    if (Request.IsAuthenticated)
+                    {
+                        Recipe recipe = db.Recipes.Find(id);
+                        //only edit the recipe which belongs to the current user
+                        if (recipe.UserId == User.Identity.GetUserId())
+                            return View(recipe);
+                    }
+                }
             }
             catch
             {
-                return View();
+                return RedirectToAction("Index");
             }
+            return RedirectToAction("Index");
+        }
+
+        // POST: Recipe/Edit/5
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditPost(int id, FormCollection collection)
+        {
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (Request.IsAuthenticated)
+                    {
+                        // TODO: Add update logic here
+                        if (id == null)
+                        {
+                            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                        }
+                       // db.Entry(objRecipe).State = EntityState.Modified;
+                        Recipe objRecipe = db.Recipes.Find(id);
+
+                        HttpPostedFileBase file = Request.Files["RecipeImageURL"];
+                        string imageName = System.IO.Path.GetFileNameWithoutExtension(file.FileName) + System.Guid.NewGuid() +
+                                            System.IO.Path.GetExtension(file.FileName);
+                        string path = System.IO.Path.Combine(Server.MapPath(clsStatic.RECIPE_IMAGES_PATH), imageName);  //full path of file
+
+
+                        objRecipe.RecipeName = collection["RecipeName"].ToString();
+                        objRecipe.RecipeDescription = collection["RecipeDescription"].ToString();
+                        objRecipe.RecipeServes = Convert.ToInt32(collection["RecipeServes"]);
+                        objRecipe.RecipeMethod = collection["RecipeMethod"].ToString();
+                        
+
+                        if (file.ContentLength>0)
+                            objRecipe.RecipeImageURL = imageName;
+                        objRecipe.LastUpdatedDate = DateTime.Now;
+
+
+                      db.Entry(objRecipe).State = EntityState.Modified;
+                        db.SaveChanges();
+
+                        //we save the file after the db changes.. might be a chance that image is large or any other error occurred.
+                        file.SaveAs(path);
+
+                        return RedirectToAction("Index");
+                    }
+                }
+            }
+            catch
+            {
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Index");
         }
 
         // GET: Recipe/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (Request.IsAuthenticated)
+                    {
+                        //if(id==null)
+                        //{
+                        //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                        //}
+                        //Recipe recipe = db.Recipes.Find(id);
+                        //if (recipe == null)
+                        //{
+                        //    return HttpNotFound();
+                        //}
+                        //return View(recipe);
+
+
+
+                        //they say dont delete in get.. will have to further investigate how to do it in post.. seems like an extra page or via javascript
+                        //but for now, lets do it here
+                        Recipe recipe = db.Recipes.Find(id);
+                        db.Recipes.Remove(recipe);
+                        db.SaveChanges();
+
+                    }
+                }
+            }
+            catch
+            {
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Index");
         }
 
         // POST: Recipe/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id, FormCollection collection)
         {
             try
             {
-                // TODO: Add delete logic here
+                if (ModelState.IsValid)
+                {
+                    if (Request.IsAuthenticated)
+                    {
+                        // TODO: Add delete logic here
+                        Recipe recipe = db.Recipes.Find(id);
+                        db.Recipes.Remove(recipe);
+                        db.SaveChanges();
+                    }
+                }
 
                 return RedirectToAction("Index");
             }

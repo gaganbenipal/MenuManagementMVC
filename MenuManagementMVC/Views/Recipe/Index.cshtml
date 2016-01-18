@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<MenuManagementMVC.Models.UserDefined.Recipe>
-
+@using MenuManagementMVC.App_Code
 @{
     ViewBag.Title = "Index";
 }
@@ -45,13 +45,25 @@
             @Html.DisplayFor(modelItem => item.RecipeMethod)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.RecipeImageURL)
+            @*@Html.DisplayFor(modelItem => item.RecipeImageURL)*@
+            <img src="@(String.Format("{0}{1}",clsStatic.RECIPE_IMAGES_PATH, item.RecipeImageURL))" alt="" height=100 width=100 />
+            @*<img src="/Uploads/RecipeImages/@item.RecipeImageURL" alt="" height=200 width=200 />*@
         </td>
   
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.RecipeId }) |
             @Html.ActionLink("Details", "Details", new { id=item.RecipeId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.RecipeId })
+            @Html.ActionLink("Delete", "Delete", 
+                            new { id=item.RecipeId },
+                            new { onclick = "return confirm('Are you sure you wish to delete this record?');" })
+
+            @*@using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn btn-default" />
+                </div>
+            }*@
         </td>
     </tr>
 }

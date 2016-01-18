@@ -9,5 +9,6 @@ namespace MenuManagementMVC.App_Code
     {
         public static string ACTIVE = "Active";
         public static string DELETED = "Deleted";
+        public static string RECIPE_IMAGES_PATH = "/Uploads/RecipeImages/";
     }
 }
