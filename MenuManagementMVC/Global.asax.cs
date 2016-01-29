@@ -20,7 +20,7 @@ namespace MenuManagementMVC
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             
             //The Below line will ReCreate the database if there is any change and delete the data
-            //Database.SetInitializer<RecipeContext>(null);
+           // Database.SetInitializer<RecipeContext>(new DropCreateDatabaseAlways<RecipeContext>());
         }
     }
 }

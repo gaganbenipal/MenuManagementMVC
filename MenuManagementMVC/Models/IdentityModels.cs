@@ -25,7 +25,7 @@ namespace MenuManagementMVC.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("MenuMgtMVC", throwIfV1Schema: false)
         {
         }
 

@@ -28,6 +28,8 @@ namespace MenuManagementMVC.Models.UserDefined
 
         public string UserId { get; set; }
         public virtual ApplicationUser User { get; set; }
+
+        public virtual ICollection<Ingredient> Ingredients { get; set; }
         
         public DateTime? LastUpdatedDate { get; set; }
         public string RecordStatus { get; set; }
