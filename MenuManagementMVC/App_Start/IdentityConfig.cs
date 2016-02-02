@@ -11,15 +11,50 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using MenuManagementMVC.Models;
+using System.Net.Mail;
+using System.Net;
+using System.Diagnostics;
+using System.Configuration;
 
 namespace MenuManagementMVC
 {
     public class EmailService : IIdentityMessageService
     {
-        public Task SendAsync(IdentityMessage message)
+        public async Task SendAsync(IdentityMessage message)
         {
             // Plug in your email service here to send an email.
-            return Task.FromResult(0);
+            await sendEmail(message);
+        }
+
+        private async Task sendEmail(IdentityMessage message)
+        {
+            try
+            {
+                var email = new MailMessage();
+                email.To.Add(message.Destination);
+                email.From = new MailAddress(ConfigurationManager.AppSettings["mailAccount"]);
+                email.Subject = message.Subject;
+                email.Body = message.Body;
+
+                using (var smtpClient = new SmtpClient(ConfigurationManager.AppSettings["smtpServer"], Convert.ToInt32(ConfigurationManager.AppSettings["mailPort"])) 
+                    { 
+                        Credentials = new NetworkCredential(ConfigurationManager.AppSettings["mailAccount"],
+                                    ConfigurationManager.AppSettings["mailPassword"]),
+                        EnableSsl = Convert.ToBoolean(ConfigurationManager.AppSettings["enableSSL"])
+                    })
+                    {
+
+                    await smtpClient.SendMailAsync(email);
+                }
+            }
+            catch (Exception)
+            {
+                Trace.TraceError("Failed to send email: ."+message.Subject);
+                throw new Exception();
+            }
+           
+
+           
         }
     }
 

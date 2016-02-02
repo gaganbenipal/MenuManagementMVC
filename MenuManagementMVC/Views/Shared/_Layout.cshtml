@@ -27,6 +27,8 @@
                     @if (Request.IsAuthenticated)
                     {
                         <li>@Html.ActionLink("Recipe", "Index", "Recipe")</li>
+                        <li>@Html.ActionLink("Ingredient", "Index", "Ingredient")</li>
+                        <li>@Html.ActionLink("Unit", "Index", "Unit")</li>
                     }
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>

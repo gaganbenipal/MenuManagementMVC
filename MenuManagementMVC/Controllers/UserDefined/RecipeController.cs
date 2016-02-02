@@ -24,19 +24,14 @@ namespace MenuManagementMVC.Controllers.UserDefined
             {
                 if (Request.IsAuthenticated)
                 {
-                    // login logic here
+                    //fetch the Recipes according to the logged in user
 
-                    //the below query will also work
+                    //the below commented query will also work
                     //IEnumerable<Recipe> objRecipe = from recipes in db.Recipes where recipes.UserId.Equals(User.Identity.GetUserId()) select recipes;
                     string userId = User.Identity.GetUserId();
                     IEnumerable<Recipe> objRecipe = db.Recipes.Where(s => s.UserId.Equals(userId));
 
                     return View(objRecipe);
-                }
-                else
-                {
-                    
-                    return Redirect("~/Home/Index");
                 }
             }
             return Redirect("~/Home/Index");
@@ -58,10 +53,6 @@ namespace MenuManagementMVC.Controllers.UserDefined
                     // login logic here
                     return View();
                 }
-                else
-                {
-                    return Redirect("~/Home/Index");
-                }
             }
             return Redirect("~/Home/Index");
            
@@ -80,7 +71,10 @@ namespace MenuManagementMVC.Controllers.UserDefined
                 {
                     if (Request.IsAuthenticated)
                     {
+                        //get the file object
                         HttpPostedFileBase file = Request.Files["RecipeImageURL"];
+
+                        //getting the image name and full path for image
                         string imageName = System.IO.Path.GetFileNameWithoutExtension(file.FileName) + System.Guid.NewGuid() +
                                             System.IO.Path.GetExtension(file.FileName);
                         string path = System.IO.Path.Combine(Server.MapPath(clsStatic.RECIPE_IMAGES_PATH), imageName);  //full path of file
@@ -105,7 +99,8 @@ namespace MenuManagementMVC.Controllers.UserDefined
             }
             catch
             {
-                return View();
+                return View("Error");
+                //return View();
             }
             return View();
         }
@@ -146,7 +141,7 @@ namespace MenuManagementMVC.Controllers.UserDefined
                     if (Request.IsAuthenticated)
                     {
                         // TODO: Add update logic here
-                        if (id == null)
+                        if (id == null || id==0)
                         {
                             return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                         }

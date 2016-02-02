@@ -1,0 +1,47 @@
+﻿@model IEnumerable<MenuManagementMVC.Models.UserDefined.Unit>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.UnitType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UnitMeasure)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UnitScale)
+        </th>
+
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.UnitType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UnitMeasure)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UnitScale)
+        </td>
+
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.UnitId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.UnitId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.UnitId })
+        </td>
+    </tr>
+}
+
+</table>

@@ -6,67 +6,56 @@ using System.Web.Mvc;
 using MenuManagementMVC.App_Code;
 using MenuManagementMVC.Context;
 using MenuManagementMVC.Models.UserDefined;
-using Microsoft.AspNet.Identity;
 
 namespace MenuManagementMVC.Controllers.UserDefined
 {
-    public class IngredientController : Controller
+    public class UnitController : Controller
     {
         RecipeContext db = new RecipeContext();
-        // GET: Ingredient
+        // GET: Unit
+        [Authorize]
         public ActionResult Index()
         {
             if (ModelState.IsValid)
             {
-                if (Request.IsAuthenticated)
-                {
-                    return View(db.Ingredients.ToList());
-                }
+                    return View(db.Units.ToList());
             }
-            return Redirect("~/Home/Index");
+            return RedirectToAction("Index", "Home");
         }
 
-        // GET: Ingredient/Details/5
+        // GET: Unit/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: Ingredient/Create
+        // GET: Unit/Create
+        [Authorize]
         public ActionResult Create()
         {
             if (ModelState.IsValid)
             {
-                if (Request.IsAuthenticated)
-                {
-                    //fetch the Recipes for the drop down according to the logged in user
-                    string userId = User.Identity.GetUserId();
-                    ViewBag.Recipes = new SelectList(db.Recipes.Where(s => s.UserId.Equals(userId)), "RecipeId", "RecipeName");
-                    ViewBag.Units = new SelectList(db.Units, "UnitType", "UnitType");
                     return View();
-                }
             }
-            return Redirect("~/Home/Index");
+            return RedirectToAction("Index", "Home");
         }
 
-        // POST: Ingredient/Create
+        // POST: Unit/Create
         [HttpPost]
-        public ActionResult Create(Ingredient ObjIngredient)
+        [Authorize]
+        public ActionResult Create(Unit objUnit)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    if (Request.IsAuthenticated)
-                    {
-                        // TODO: Add insert logic here
-                        ObjIngredient.LastUpdatedDate = DateTime.Now;
-                        ObjIngredient.RecordStatus = clsStatic.ACTIVE;
-                        db.Ingredients.Add(ObjIngredient);
-                        db.SaveChanges();
+                    // TODO: Add insert logic here
+                    objUnit.LastUpdatedDate = DateTime.Now;
+                    objUnit.RecordStatus = clsStatic.ACTIVE;
+                    db.Units.Add(objUnit);
+                    db.SaveChanges();
 
-                        return RedirectToAction("Index");
-                    }
+                    return RedirectToAction("Index");
                 }
                 return RedirectToAction("Index", "Home");
             }
@@ -76,13 +65,13 @@ namespace MenuManagementMVC.Controllers.UserDefined
             }
         }
 
-        // GET: Ingredient/Edit/5
+        // GET: Unit/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: Ingredient/Edit/5
+        // POST: Unit/Edit/5
         [HttpPost]
         public ActionResult Edit(int id, FormCollection collection)
         {
@@ -98,13 +87,13 @@ namespace MenuManagementMVC.Controllers.UserDefined
             }
         }
 
-        // GET: Ingredient/Delete/5
+        // GET: Unit/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: Ingredient/Delete/5
+        // POST: Unit/Delete/5
         [HttpPost]
         public ActionResult Delete(int id, FormCollection collection)
         {

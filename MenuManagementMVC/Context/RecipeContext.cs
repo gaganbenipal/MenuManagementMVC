@@ -10,7 +10,12 @@ namespace MenuManagementMVC.Context
 {
     public class RecipeContext : DbContext
     {
-     
+
+        public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<Unit> Units { get; set; }
+        public System.Data.Entity.DbSet<MenuManagementMVC.Models.ApplicationUser> ApplicationUsers { get; set; }
+
         /// <summary>
         /// Seems like this is required when we take userid as foriegn key
         /// </summary>
@@ -23,9 +28,5 @@ namespace MenuManagementMVC.Context
         }
 
 
-        public DbSet<Recipe> Recipes { get; set; }
-        public DbSet<Ingredient> Ingredients { get; set; }
-        public DbSet<Unit> Units { get; set; }
-        public System.Data.Entity.DbSet<MenuManagementMVC.Models.ApplicationUser> ApplicationUsers { get; set; }
     }
 }
